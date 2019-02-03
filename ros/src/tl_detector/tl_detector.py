@@ -53,7 +53,6 @@ class TLDetector(object):
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
-        self.dummy_count = 0
         rospy.logwarn("TLDetector Init")
 
         rospy.spin()
@@ -143,18 +142,6 @@ class TLDetector(object):
             return False
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
-        # Return a dummy classification for testing
-        # self.dummy_count = self.dummy_count + 1
-        # if self.dummy_count < 400:
-        #     return  TrafficLight.GREEN
-        # elif self.dummy_count < 1000:
-        #     return  TrafficLight.RED
-        # else:
-        #     self.dummy_count = 0
-        #     return  TrafficLight.GREEN
-        # return TrafficLight.RED
-        #Get classification
         return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
@@ -187,11 +174,10 @@ class TLDetector(object):
                     closest_light = light
                     line_wp_idx = temp_wp_idx
 
-        #rospy.logwarn("process_traffic_lights:")
-
         if closest_light:
-            state = self.get_light_state(closest_light)
-            #rospy.logwarn("count:{2} closest_light: {0} state:{1}".format(line_wp_idx, state, self.dummy_count))
+            # state = self.get_light_state(closest_light)
+            state = closest_light.state
+            # rospy.logwarn("closest_light: {0} state:{1}".format(line_wp_idx, state))
             return line_wp_idx, state
 
         return -1, TrafficLight.UNKNOWN
